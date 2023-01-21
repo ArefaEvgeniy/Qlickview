@@ -65,6 +65,25 @@ def future_staff_report(stores):
                 file_writer.writerow(data)
 
 
+def future_sales_report(stores):
+    file_name = os.path.join(BASE_DIR, 'data', 'FutureSales.csv')
+    name_of_fields = ['Магазин', 'Дата']
+    name_of_fields.extend(HOURS)
+    with open(file_name, mode="w", encoding='Windows-1251') as w_file:
+        file_writer = csv.writer(w_file, delimiter=";")
+        file_writer.writerow(name_of_fields)
+        names_stores = list(stores.keys())
+        for name in names_stores:
+            dates = list(stores[name].future_sales.keys())
+            for date in dates:
+                data = [name, ]
+                data.append(date.strftime("%d.%m.%Y"))
+                for hour in HOURS:
+                    number = stores[name].future_sales[date].get(int(hour), 0)
+                    data.append(number if number > 0 else '')
+                file_writer.writerow(data)
+
+
 def main(days):
     stores = create_stores()
     fill_sales(stores)
@@ -72,6 +91,7 @@ def main(days):
         store.calculate_future_sales(days)
         store.calculate_future_staff()
     future_staff_report(stores)
+    future_sales_report(stores)
 
 
 if __name__ == "__main__":
